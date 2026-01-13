@@ -111,7 +111,7 @@ let
       # Core dependencies
       hytale-launcher-unwrapped
 
-      # WebKit/GTK stack
+      # WebKit/GTK stack (for launcher UI)
       webkitgtk_4_1
       gtk3
       glib
@@ -122,13 +122,15 @@ let
       at-spi2-atk
       harfbuzz
 
-      # Graphics
+      # Graphics - OpenGL/Vulkan/EGL (for game client via SDL3)
       libGL
-      libxkbcommon
+      libGLU
+      libglvnd
       mesa
       vulkan-loader
+      egl-wayland
 
-      # X11
+      # X11 (SDL3 dlopens these)
       xorg.libX11
       xorg.libXcomposite
       xorg.libXdamage
@@ -138,13 +140,20 @@ let
       xorg.libXcursor
       xorg.libXi
       xorg.libxcb
+      xorg.libXScrnSaver
+      xorg.libXinerama
+      xorg.libXxf86vm
 
-      # Audio
+      # Wayland (SDL3 can use Wayland backend)
+      wayland
+      libxkbcommon
+
+      # Audio (for game client via bundled OpenAL)
       alsa-lib
       pipewire
       pulseaudio
 
-      # System
+      # System libraries
       dbus
       fontconfig
       freetype
@@ -153,6 +162,18 @@ let
       nss
       systemd
       zlib
+
+      # C++ runtime (needed by libNoesis.so, libopenal.so in game client)
+      stdenv.cc.cc.lib
+
+      # .NET runtime dependencies (HytaleClient is a .NET application)
+      icu
+      openssl
+      krb5
+
+      # TLS/SSL support for GLib networking (launcher)
+      glib-networking
+      cacert
     ];
 
     runScript = pkgs.writeShellScript "hytale-launcher-wrapper" ''
@@ -175,6 +196,12 @@ let
 
       # Required environment variable from Flatpak metadata
       export WEBKIT_DISABLE_COMPOSITING_MODE=1
+
+      # Enable GLib TLS backend (glib-networking)
+      export GIO_MODULE_DIR=/usr/lib/gio/modules
+
+      # SSL certificates
+      export SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt
 
       exec "$LAUNCHER_BIN" "$@"
     '';
