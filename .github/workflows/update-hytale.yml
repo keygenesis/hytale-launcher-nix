@@ -29,6 +29,7 @@ jobs:
       - name: Check for updates
         id: check
         run: |
+          set -o pipefail
           chmod +x ./scripts/update-version.sh
 
           # Capture output for GitHub Actions
