@@ -36,5 +36,6 @@
         };
       });
 
+      formatter = eachSystem (system: pkgsFor.${system}.nixfmt);
     };
 }
