@@ -173,8 +173,12 @@ let
         echo "$BUNDLED_HASH" > "$BUNDLED_HASH_FILE"
       fi
 
-      # Required environment variable from Flatpak metadata
+      # Required environment variables from Flatpak metadata / upstream nixpkgs
       export WEBKIT_DISABLE_COMPOSITING_MODE=1
+
+      # NVIDIA Wayland fixes (see issue #15)
+      export __NV_DISABLE_EXPLICIT_SYNC=1
+      export WEBKIT_DISABLE_DMABUF_RENDERER=1
 
       # Enable GLib TLS backend (glib-networking)
       export GIO_MODULE_DIR=/usr/lib/gio/modules
